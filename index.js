@@ -17,10 +17,6 @@ let dataRoom = []
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
-    socket.on('message', (data) => {
-        socketIO.emit('messageResponse', data);
-    });
-
 
     // Créer une room et ajouter l'utilisateur
     socket.on('onJoin', (socket) => {
@@ -67,21 +63,55 @@ socketIO.on('connection', (socket) => {
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
-    //Permet de remove l'utilisateur de la room
-    socket.on('leaveRoom', (socket) => {
-
-        dataRoom.map(room => {
-            if(room.idRoom === socket.idRoom) {
-                room.users.map((user, index) => {
-                    if(user.name === socket.name){
-                        user.splice(index, 1)
+    // Ajouter l'adresse du restaurant a un utilisateur
+    socket.on('setRestauPosition', (socket) => {
+        dataRoom.map((room) => {
+            if (room.idRoom === socket.idRoom) {
+                console.log("dans le if")
+                room.users.map((user) => {
+                    console.log(user.name)
+                    console.log(socket.nameUser)
+                    if (user.name === socket.nameUser) {
+                        console.log("le user est trouvé")
+                        console.log(user.positionRestau, socket.positionRestau)
+                        user.positionRestau = socket.positionRestau
                     }
                 })
             }
         })
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
+
+    //Permet de remove l'utilisateur de la room
+    socket.on('leaveRoom', (socket) => {
+        dataRoom.map((room) => {
+            if (room.idRoom === socket.idRoom) {
+                console.log("la room est trouvé")
+                room.users.map((user, index) => {
+                    if (user.name === socket.nameUser) {
+                        console.log("le user est trouvé")
+                        room.users.splice(index, 1)
+                    }
+                })
+            }else {
+                console.log("la room n'est pas trouvé")
+            }
+        })
         //Return du tableau de données mis a jour
         console.log(dataRoom)
-        socketIO.emit('leaveRoomResponse', dataRoom)
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
+
+    socket.on('sendMessage', (socket) => {
+        dataRoom.map((room) => {
+            if (room.idRoom === socket.idRoom) {
+                room.messages.push({
+                    name: socket.nameUser,
+                    message: socket.message
+                })
+            }
+        })
+        socketIO.emit('dataRoomResponse', dataRoom)
     })
 
     socket.on('disconnect', () => {
