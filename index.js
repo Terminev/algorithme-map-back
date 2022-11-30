@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const PORT = 4000;
 
-//New imports
 const http = require('http').Server(app);
 const cors = require('cors');
 
@@ -16,58 +15,79 @@ const socketIO = require('socket.io')(http, {
 
 let dataRoom = []
 
-//Add this before the app.get() block
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
-    //Listens and logs the message to the console
     socket.on('message', (data) => {
-        // console.log(data)
         socketIO.emit('messageResponse', data);
     });
 
 
-
+    // Créer une room et ajouter l'utilisateur
     socket.on('onJoin', (socket) => {
-        console.log(socket)
-        if(dataRoom.length > 0){
-            dataRoom.map(data => {
-            console.log(data)
-            if(!data.includes(socket.idRoom)){
-                dataRoom = [...data, {
-                    id : socket.idRoom, 
-                    name : socket.nameRoom, 
-                    [
-                        {
-                            userName : ,
-                            userPosition : ,
-                            restauPosition : ,
-                        }
-                    ]
-                }]
-            
-                console.log(dataRoom)
-            }else{
-                data = [
-                    ...data,
-                    [
+        let error = 0
+        if(dataRoom.length > 0) {
+            dataRoom.map((room) => {
+                if (room.idRoom === socket.idRoom) {
+                    room.users.push({
+                        name: socket.nameUser,
+                        positionUser: socket.positionUser,
+                        positionRestau: socket.positionRestau,
+                    })
+                } else if (error === (dataRoom.length-1)) {
+                    dataRoom.push({
+                        idRoom: socket.idRoom,
+                        nameRoom: socket.nameRoom,
+                        users: [
+                            {
+                                name: socket.nameUser,
+                                positionUser: socket.positionUser,
+                                positionRestau: socket.positionRestau,
+                            }
+                        ]
+                    })
+                } else {
+                    error++;
+                }
+            })
+        }else {
+            dataRoom.push({
+                idRoom: socket.idRoom,
+                nameRoom: socket.nameRoom,
+                users: [
+                    {
+                        name: socket.nameUser,
+                        positionUser: socket.positionUser,
+                        positionRestau: socket.positionRestau,
+                    }
+                ],
+                messages: []
+            })
+        }
+        console.log(dataRoom)
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
 
-                    ]
-                ]
+    //Permet de remove l'utilisateur de la room
+    socket.on('leaveRoom', (socket) => {
+
+        dataRoom.map(room => {
+            if(room.idRoom === socket.idRoom) {
+                room.users.map((user, index) => {
+                    if(user.name === socket.name){
+                        user.splice(index, 1)
+                    }
+                })
             }
         })
-        }else{
-                dataRoom = [[socket.idRoom, socket.nameRoom, []]]
-                console.log(dataRoom, 'coucou')
-        }
-        
+        //Return du tableau de données mis a jour
+        console.log(dataRoom)
+        socketIO.emit('leaveRoomResponse', dataRoom)
     })
 
     socket.on('disconnect', () => {
         console.log('🔥: A user disconnected');
     });
 });
-
-// Listing room
 
 
 app.get('/api', (req, res) => {
