@@ -14,18 +14,61 @@ const socketIO = require('socket.io')(http, {
     }
 });
 
+let dataRoom = []
+
 //Add this before the app.get() block
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     //Listens and logs the message to the console
     socket.on('message', (data) => {
-        console.log(data)
+        // console.log(data)
         socketIO.emit('messageResponse', data);
     });
+
+
+
+    socket.on('onJoin', (socket) => {
+        console.log(socket)
+        if(dataRoom.length > 0){
+            dataRoom.map(data => {
+            console.log(data)
+            if(!data.includes(socket.idRoom)){
+                dataRoom = [...data, {
+                    id : socket.idRoom, 
+                    name : socket.nameRoom, 
+                    [
+                        {
+                            userName : ,
+                            userPosition : ,
+                            restauPosition : ,
+                        }
+                    ]
+                }]
+            
+                console.log(dataRoom)
+            }else{
+                data = [
+                    ...data,
+                    [
+
+                    ]
+                ]
+            }
+        })
+        }else{
+                dataRoom = [[socket.idRoom, socket.nameRoom, []]]
+                console.log(dataRoom, 'coucou')
+        }
+        
+    })
+
     socket.on('disconnect', () => {
         console.log('🔥: A user disconnected');
     });
 });
+
+// Listing room
+
 
 app.get('/api', (req, res) => {
     res.json({
