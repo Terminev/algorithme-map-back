@@ -17,6 +17,7 @@ let dataRoom = []
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
+    socketIO.emit('dataRoomResponse', dataRoom)
 
     // Créer une room et ajouter l'utilisateur
     socket.on('onJoin', (socket) => {
@@ -39,7 +40,8 @@ socketIO.on('connection', (socket) => {
                                 positionUser: socket.positionUser,
                                 positionRestau: socket.positionRestau,
                             }
-                        ]
+                        ],
+                        messages: []
                     })
                 } else {
                     error++;
@@ -67,10 +69,7 @@ socketIO.on('connection', (socket) => {
     socket.on('setRestauPosition', (socket) => {
         dataRoom.map((room) => {
             if (room.idRoom === socket.idRoom) {
-                console.log("dans le if")
                 room.users.map((user) => {
-                    console.log(user.name)
-                    console.log(socket.nameUser)
                     if (user.name === socket.nameUser) {
                         console.log("le user est trouvé")
                         console.log(user.positionRestau, socket.positionRestau)
@@ -93,18 +92,19 @@ socketIO.on('connection', (socket) => {
                         room.users.splice(index, 1)
                     }
                 })
-            }else {
-                console.log("la room n'est pas trouvé")
             }
         })
         //Return du tableau de données mis a jour
-        console.log(dataRoom)
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
+    //Permet de stocker les messages dans la room
     socket.on('sendMessage', (socket) => {
+        console.log("dans le send message")
         dataRoom.map((room) => {
+
             if (room.idRoom === socket.idRoom) {
+                console.log(room)
                 room.messages.push({
                     name: socket.nameUser,
                     message: socket.message
