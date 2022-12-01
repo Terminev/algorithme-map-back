@@ -41,7 +41,9 @@ socketIO.on('connection', (socket) => {
                                 positionRestau: socket.positionRestau,
                             }
                         ],
-                        messages: []
+                        messages: [],
+                        appointment: null,
+
                     })
                 } else {
                     error++;
@@ -58,10 +60,10 @@ socketIO.on('connection', (socket) => {
                         positionRestau: socket.positionRestau,
                     }
                 ],
-                messages: []
+                messages: [],
+                appointment: null,
             })
         }
-        console.log(dataRoom)
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
@@ -95,6 +97,17 @@ socketIO.on('connection', (socket) => {
             }
         })
         //Return du tableau de données mis a jour
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
+
+    //Permet d'ajouter le point de rendez-vous
+    socket.on('setAppointment', (socket) => {
+        dataRoom.map((room) => {
+            if (room.idRoom === socket.idRoom) {
+                room.appointment = socket.appointment
+            }
+        })
+        console.log(dataRoom)
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
