@@ -41,6 +41,20 @@ socketIO.on('connection', (socket) => {
 
     })
 
+    //mettre a jour la position de l'utilisateur
+    socket.on('updatePosition', (socket) => {
+        dataRoom.map(room => {
+            if (room.idRoom === socket.idRoom) {
+                room.users.map((user, index) => {
+                    if (user.name === socket.name) {
+                        user.positionUser = socket.position
+                    }
+                })
+            }
+        })
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
+
     //Créer une room
     socket.on('createRoom', (socket) => {
         dataRoom.push({
@@ -111,8 +125,6 @@ socketIO.on('connection', (socket) => {
             if (room.idRoom === socket.idRoom) {
                 room.users.map((user) => {
                     if (user.name === socket.nameUser) {
-                        console.log("le user est trouvé")
-                        console.log(user.positionRestau, socket.positionRestau)
                         user.positionRestau = socket.positionRestau
                     }
                 })
@@ -125,10 +137,8 @@ socketIO.on('connection', (socket) => {
     socket.on('leaveRoom', (socket) => {
         dataRoom.map((room) => {
             if (room.idRoom === socket.idRoom) {
-                console.log("la room est trouvé")
                 room.users.map((user, index) => {
                     if (user.name === socket.nameUser) {
-                        console.log("le user est trouvé")
                         room.users.splice(index, 1)
                     }
                 })
@@ -145,17 +155,14 @@ socketIO.on('connection', (socket) => {
                 room.appointment = socket.appointment
             }
         })
-        console.log(dataRoom)
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
     //Permet de stocker les messages dans la room
     socket.on('sendMessage', (socket) => {
-        console.log("dans le send message")
         dataRoom.map((room) => {
 
             if (room.idRoom === socket.idRoom) {
-                console.log(room)
                 room.messages.push({
                     name: socket.nameUser,
                     message: socket.message
