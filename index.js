@@ -29,6 +29,18 @@ socketIO.on('connection', (socket) => {
         socketIO.emit('dataRoomResponse', dataRoom)
     })
 
+    //Supprimer une room
+    socket.on('deleteRoom', (socket) => {
+        dataRoom.map((room, index) => {
+            if (room.idRoom === socket.idRoom) {
+                dataRoom.splice(index, 1)
+            }
+        })
+        socketIO.emit('deletedRoom', socket.idRoom)
+        socketIO.emit('dataRoomResponse', dataRoom)
+
+    })
+
     //Créer une room
     socket.on('createRoom', (socket) => {
         dataRoom.push({
