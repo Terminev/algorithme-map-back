@@ -36,7 +36,7 @@ socketIO.on('connection', (socket) => {
             nameRoom: socket.nameRoom,
             users: [],
             messages: [],
-            appointment: null,
+            appointment: [48.893147, 2.226911],
             date: socket.date,
         })
         socketIO.emit('dataRoomResponse', dataRoom)
@@ -66,7 +66,7 @@ socketIO.on('connection', (socket) => {
                             }
                         ],
                         messages: [],
-                        appointment: null,
+                        appointment: [48.893147, 2.226911],
                         date: ""
 
                     })
@@ -86,7 +86,7 @@ socketIO.on('connection', (socket) => {
                     }
                 ],
                 messages: [],
-                appointment: null,
+                appointment: [48.893147, 2.226911],
                 date: "",
             })
         }
