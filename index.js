@@ -19,6 +19,19 @@ socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
     socketIO.emit('dataRoomResponse', dataRoom)
 
+    //Créer une room
+    socket.on('createRoom', (socket) => {
+        dataRoom.push({
+            idRoom: socket.idRoom,
+            nameRoom: socket.nameRoom,
+            users: [],
+            messages: [],
+            appointment: null,
+            date: socket.date,
+        })
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
+
     // Créer une room et ajouter l'utilisateur
     socket.on('onJoin', (socket) => {
         let error = 0
@@ -30,6 +43,7 @@ socketIO.on('connection', (socket) => {
                         positionUser: socket.positionUser,
                         positionRestau: socket.positionRestau,
                     })
+
                 } else if (error === (dataRoom.length-1)) {
                     dataRoom.push({
                         idRoom: socket.idRoom,
@@ -43,6 +57,7 @@ socketIO.on('connection', (socket) => {
                         ],
                         messages: [],
                         appointment: null,
+                        date: ""
 
                     })
                 } else {
@@ -62,6 +77,7 @@ socketIO.on('connection', (socket) => {
                 ],
                 messages: [],
                 appointment: null,
+                date: "",
             })
         }
         socketIO.emit('dataRoomResponse', dataRoom)
