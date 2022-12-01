@@ -16,8 +16,18 @@ const socketIO = require('socket.io')(http, {
 let dataRoom = []
 
 socketIO.on('connection', (socket) => {
-    console.log(`⚡: ${socket.id} user just connected!`);
     socketIO.emit('dataRoomResponse', dataRoom)
+
+    //Editer l'heure du rendez-vous
+    socket.on('editRoom', (socket) => {
+        dataRoom.map(room => {
+            if (room.idRoom === socket.idRoom) {
+                room.date = socket.date
+
+            }
+        })
+        socketIO.emit('dataRoomResponse', dataRoom)
+    })
 
     //Créer une room
     socket.on('createRoom', (socket) => {
